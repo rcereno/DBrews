@@ -11,8 +11,9 @@ def get_catalog():
     Each unique item combination must have only a single price.
     """
     with db.engine.begin() as connection:
-        green_quantity = connection.execute(sqlalchemy.text("SELECT num_green_potions FROM global_inventory")).scalar()
+        green_quantity = connection.execute(sqlalchemy.text("SELECT num_green_potions FROM global_inventory")).scalar_one()
 
+        # scalar_one: changes it from the object to a number 
     return [
             {
                 "sku": "GREEN_POTION_0",

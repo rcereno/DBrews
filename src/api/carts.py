@@ -108,9 +108,9 @@ class CartCheckout(BaseModel):
 def checkout(cart_id: int, cart_checkout: CartCheckout):
     """ """
     with db.engine.begin() as connection:
-        amt_green_potions = connection.execute(sqlalchemy.text("SELECT num_green_potions FROM global_inventory"))
+        amt_green_potions = connection.execute(sqlalchemy.text("SELECT num_green_potions FROM global_inventory")).scalar_one()
         amt_green_potions = amt_green_potions + 1
-        amt_gold = connection.execute(sqlalchemy.text("SELECT gold FROM global_inventory"))
+        amt_gold = connection.execute(sqlalchemy.text("SELECT gold FROM global_inventory")).scalar_one()
         amt_gold = amt_gold + 50
         result = connection.execute(sqlalchemy.text("UPDATE global_inventory SET gold = {amt_gold}, num_green_potions={amt_green_potions}"))
 

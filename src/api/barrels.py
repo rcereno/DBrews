@@ -42,15 +42,25 @@ def post_deliver_barrels(barrels_delivered: list[Barrel], order_id: int):
 # Gets called once a day
 @router.post("/plan")
 def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
-    """ """
-
+    """
+    - select how many green potions 
+    - select gold 
+    - check how much gold green barrel costs // check how much gold abt to spend
+    - check all conditions to see if u want to buy green barrel (if num_green_potions < 10 and have enough gold)"""
+# if barrel is less than gold 
 
     print(wholesale_catalog)
 
-    return [
-        {
-            "sku": "SMALL_RED_BARREL",
-            "quantity": 1,
-        }
-    ]
+    with db.engine.begin() as connection: 
+        amt_green_potions = connection.execute(sqlalchemy.text("SELECT num_green_potions FROM global_inventory")).scalar_one()
+        amt_gold = connection.execute(sqlalchemy.text("SELECT gold FROM global_inventory")).scalar_one()
+
+    for barrel in wholesale_catalog:
+        if ((amt_green_potions < 10) and (barrel.price <= amt_gold)):
+            return [
+                {
+                    "sku": "SMALL_RED_BARREL",
+                    "quantity": 1,
+                }
+            ]
 

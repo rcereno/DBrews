@@ -5,6 +5,8 @@ from src.api import auth
 import sqlalchemy
 from src import database as db
 
+# have enough ml then make
+
 router = APIRouter(
     prefix="/bottler",
     tags=["bottler"],
@@ -45,17 +47,18 @@ def get_bottle_plan():
     # Expressed in integers from 1 to 100 that must sum up to 100.
 
     # Initial logic: bottle all barrels into red potions.
-
+    bottler_plan = []
     with db.engine.begin() as connection: 
         amt_green_ml = connection.execute(sqlalchemy.text("SELECT num_green_ml FROM global_inventory")).scalar()
         if(amt_green_ml >= 100):
-            return [
+            bottler_plan.append(
             {
                 "potion_type": [0, 100, 0, 0],
                 # "quantity": 5,
-                "quantity": amt_green_ml / 100
-            }
-        ]
+                "quantity": amt_green_ml // 100
+            })
+    
+    return bottler_plan
 #  // 100 ?
     # return [
     #         {

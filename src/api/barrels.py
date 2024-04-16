@@ -23,8 +23,15 @@ class Barrel(BaseModel):
 def post_deliver_barrels(barrels_delivered: list[Barrel], order_id: int):
     """ """
     with db.engine.begin() as connection:
-        total_ml_val = connection.execute(sqlalchemy.text("SELECT num_green_ml FROM global_inventory")).scalar_one()
-        total_price_val = connection.execute(sqlalchemy.text("SELECT num_green_potions FROM global_inventory")).scalar_one()
+        total_green_ml_val = connection.execute(sqlalchemy.text("SELECT num_green_ml FROM global_inventory")).scalar_one()
+        total_green_price_val = connection.execute(sqlalchemy.text("SELECT num_green_potions FROM global_inventory")).scalar_one()
+
+
+        # total_red_ml_val = connection.execute(sqlalchemy.text("SELECT num_red_ml FROM global_inventory")).scalar_one()
+        # total_red_price_val = connection.execute(sqlalchemy.text("SELECT num_red_potions FROM global_inventory")).scalar_one()
+
+        # total_blue_ml_val = connection.execute(sqlalchemy.text("SELECT num_blue_ml FROM global_inventory")).scalar_one()
+        # total_blue_price_val = connection.execute(sqlalchemy.text("SELECT num_blue_potions FROM global_inventory")).scalar_one()
 
     for barrel in barrels_delivered:
         amt_of_ml = barrel.ml_per_barrel * barrel.quantity
@@ -52,18 +59,44 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
 
     print(wholesale_catalog)
 
+    wholesale_purchase_list = []
+
     with db.engine.begin() as connection: 
         amt_green_potions = connection.execute(sqlalchemy.text("SELECT num_green_potions FROM global_inventory")).scalar_one()
+        amt_red_potions = connection.execute(sqlalchemy.text("SELECT num_red_potions FROM global_inventory")).scalar_one()
+        amt_blue_potions = connection.execute(sqlalchemy.text("SELECT num_blue_potions FROM global_inventory")).scalar_one()
         amt_gold = connection.execute(sqlalchemy.text("SELECT gold FROM global_inventory")).scalar_one()
 
     for barrel in wholesale_catalog:
         if barrel.sku == "SMALL_GREEN_BARREL":
             if ((amt_green_potions < 10) and (barrel.price <= amt_gold)):
-                return [
-                    {
-                        "sku": barrel.sku,
-                        "quantity": 1,
-                    }
-                ]
+                amt_gold -= barrel.price
+                wholesale_purchase_list.append({"sku": barrel.sku,"quantity": 1,})
+                # return [
+                    # {
+                    #     "sku": barrel.sku,
+                    #     "quantity": 1,
+                    # }
+                # ]
+        if barrel.sku == "SMALL_RED_BARREL":
+            if ((amt_red_potions < 10) and (barrel.price <= amt_gold)):
+                amt_gold -= barrel.price
+                wholesale_purchase_list.append({"sku": barrel.sku,"quantity": 1,})
+                # return [
+                #     {
+                #         "sku": barrel.sku,
+                #         "quantity": 1,
+                #     }
+                # ]
+        if barrel.sku == "SMALL_BLUE_BARREL":
+            if ((amt_blue_potions < 10) and (barrel.price <= amt_gold)):
+                amt_gold -= barrel.price
+                wholesale_purchase_list.append({"sku": barrel.sku,"quantity": 1,})
+                # return [
+                #     {
+                #         "sku": barrel.sku,
+                #         "quantity": 1,
+                #     }
+                # ]
     return []
 

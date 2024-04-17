@@ -109,12 +109,23 @@ class CartCheckout(BaseModel):
 def checkout(cart_id: int, cart_checkout: CartCheckout):
     """ """
     print(f"checkout {cart_id}")
-
+    amount = 0
+    amt_gold = 0
+    amt_green_potions = 0
+    amt_red_potions = 0
+    amt_blue_potions = 0
     with db.engine.begin() as connection:
         amt_green_potions = connection.execute(sqlalchemy.text("SELECT num_green_potions FROM global_inventory")).scalar_one()
         amt_green_potions = amt_green_potions + 1
+
+        amt_red_potions = connection.execute(sqlalchemy.text("SELECT num_red_potions FROM global_inventory")).scalar_one()
+        amt_red_potions = amt_red_potions + 1
+
+        amt_blue_potions = connection.execute(sqlalchemy.text("SELECT num_blue_potions FROM global_inventory")).scalar_one()
+        amt_blue_potions = amt_blue_potions + 1
+
         amt_gold = connection.execute(sqlalchemy.text("SELECT gold FROM global_inventory")).scalar_one()
         amt_gold = amt_gold + 50
-        result = connection.execute(sqlalchemy.text("UPDATE global_inventory SET gold = {amt_gold}, num_green_potions={amt_green_potions}"))
+        result = connection.execute(sqlalchemy.text(f"UPDATE global_inventory SET gold = {amt_gold}, num_green_potions={amt_green_potions}, num_red_potions={amt_red_potions}, num_blue_potions={amt_blue_potions}"))
 
-    return {"total_potions_bought": 1, "total_gold_paid": 50}
+    return {"total_potions_bought": amt_green_potions + amt_blue_potions + amt_red_potions, "total_gold_paid": amt_gold}

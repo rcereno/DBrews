@@ -21,12 +21,15 @@ class PotionInventory(BaseModel):
 def post_deliver_bottles(potions_delivered: list[PotionInventory], order_id: int):
     """ """
     for potion in potions_delivered:
-        res_green_ml = res_green_ml - (100*potion.quantity)
-        res_green_potions = res_green_potions + potion.quantity
-        res_red_ml = res_red_ml - (100*potion.quantity)
-        res_red_potions = res_red_potions + potion.quantity
-        res_blue_ml = res_blue_ml - (100*potion.quantity)
-        res_blue_potions = res_blue_potions + potion.quantity
+        if potion.potion_type == [0, 100, 0, 0]:
+            res_green_ml = res_green_ml - (100*potion.quantity)
+            res_green_potions = res_green_potions + potion.quantity
+        if potion.potion_type == [100, 0, 0, 0]:
+            res_red_ml = res_red_ml - (100*potion.quantity)
+            res_red_potions = res_red_potions + potion.quantity
+        if potion.potion_type == [0, 0, 100, 0]:
+            res_blue_ml = res_blue_ml - (100*potion.quantity)
+            res_blue_potions = res_blue_potions + potion.quantity
 
     with db.engine.begin() as connection: 
         amt_green_ml = connection.execute(sqlalchemy.text("SELECT num_green_ml FROM global_inventory")).scalar()

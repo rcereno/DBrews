@@ -20,6 +20,10 @@ class PotionInventory(BaseModel):
 @router.post("/deliver/{order_id}")
 def post_deliver_bottles(potions_delivered: list[PotionInventory], order_id: int):
     """ """
+    res_green_ml = 0
+    res_red_ml = 0
+    res_blue_ml = 0
+    
     for potion in potions_delivered:
         if potion.potion_type == [0, 100, 0, 0]:
             res_green_ml = res_green_ml - (100*potion.quantity)

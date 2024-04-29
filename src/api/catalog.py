@@ -19,7 +19,8 @@ def get_catalog():
         # results = connection.execute(sqlalchemy.text("SELECT inventory, sku, type, price from potion_inventory"))
         results = connection.execute(sqlalchemy.text("SELECT sku, price, quantity, potion_type from potion_inventory"))
         for row in results:
-            catalog.append({"sku": row.sku, "name": row.sku, "quantity": row.quantity, "price": row.price, "potion_type": row.potion_type})
+            if row.quantity > 0: 
+                catalog.append({"sku": row.sku, "name": row.sku, "quantity": row.quantity, "price": row.price, "potion_type": row.potion_type})
     return catalog
 
     # catalog = []

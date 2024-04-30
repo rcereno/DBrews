@@ -85,6 +85,7 @@ def post_visits(visit_id: int, customers: list[Customer]):
 
 
 @router.post("/")
+# CREATE A CART
 def create_cart(new_cart: Customer):
     """ """
     print(f"new cart: {new_cart}")
@@ -109,20 +110,27 @@ class CartCheckout(BaseModel):
 def checkout(cart_id: int, cart_checkout: CartCheckout):
     """ """
     print(f"checkout {cart_id}")
-    amount = 0
     amt_gold = 0
     amt_green_potions = 0
     amt_red_potions = 0
     amt_blue_potions = 0
+    amt_dark_potions = 0
+
     with db.engine.begin() as connection:
-        amt_green_potions = connection.execute(sqlalchemy.text("SELECT num_green_potions FROM global_inventory")).scalar_one()
+        # amt_green_potions = connection.execute(sqlalchemy.text("SELECT num_green_potions FROM global_inventory")).scalar_one()
+        amt_red_potions = connection.execute(sqlalchemy.text("SELECT quantity FROM potion_inventory WHERE potion_id = 1"))
         amt_green_potions = amt_green_potions + 1
 
-        amt_red_potions = connection.execute(sqlalchemy.text("SELECT num_red_potions FROM global_inventory")).scalar_one()
+        # amt_red_potions = connection.execute(sqlalchemy.text("SELECT num_red_potions FROM global_inventory")).scalar_one()
+        amt_red_potions = connection.execute(sqlalchemy.text("SELECT quantity FROM potion_inventory WHERE potion_id = 3"))
         amt_red_potions = amt_red_potions + 1
 
-        amt_blue_potions = connection.execute(sqlalchemy.text("SELECT num_blue_potions FROM global_inventory")).scalar_one()
+        # amt_blue_potions = connection.execute(sqlalchemy.text("SELECT num_blue_potions FROM global_inventory")).scalar_one()
+        amt_blue_potions = connection.execute(sqlalchemy.text("SELECT num_blue_potions FROM global_inventory"))
         amt_blue_potions = amt_blue_potions + 1
+
+        amt_dark_potions = connection.execute(sqlalchemy.text("SELECT num_dark_potions FROM global_inventory")).scalar_one()
+        amt_dark_potions = amt_dark_potions + 1
 
         amt_gold = connection.execute(sqlalchemy.text("SELECT gold FROM global_inventory")).scalar_one()
         amt_gold = amt_gold + 50

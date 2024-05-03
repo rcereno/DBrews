@@ -21,9 +21,9 @@ def get_inventory():
         amt_red_ml = connection.execute(sqlalchemy.text("SELECT num_red_ml FROM global_inventory")).scalar_one()
         amt_blue_ml = connection.execute(sqlalchemy.text("SELECT num_blue_ml FROM global_inventory")).scalar_one()
 
-        amt_green_potions = connection.execute(sqlalchemy.text("SELECT quantity FROM potion_inventory WHERE id=2")).scalar_one()
-        amt_red_potions = connection.execute(sqlalchemy.text("SELECT quantity FROM potion_inventory WHERE id=1")).scalar_one()
-        amt_blue_potions = connection.execute(sqlalchemy.text("SELECT quantity FROM potion_inventory WHERE id=3")).scalar_one()
+        amt_green_potions = connection.execute(sqlalchemy.text("SELECT quantity FROM potion_inventory WHERE potion_id=2")).scalar_one()
+        amt_red_potions = connection.execute(sqlalchemy.text("SELECT quantity FROM potion_inventory WHERE Potion_id=1")).scalar_one()
+        amt_blue_potions = connection.execute(sqlalchemy.text("SELECT quantity FROM potion_inventory WHERE potion_id=3")).scalar_one()
 
         amt_gold = connection.execute(sqlalchemy.text("SELECT gold FROM global_inventory")).scalar_one()
 

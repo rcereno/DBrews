@@ -5,6 +5,19 @@ import sqlalchemy
 from src import database as db
 from sqlalchemy.exc import IntegrityError
 
+''' simple logic that doesn't look at potions
+
+buy whatever barrel you have the least amount of ml for - write that logic
+buy small barrel and itll start with the one you have the least of 
+
+you will query your current ml (see what you have the least of and then buy one barrel of that)
+
+do that - test it
+make sure deliver works
+
+do local testing of plan and deliver
+'''
+
 router = APIRouter(
     prefix="/barrels",
     tags=["barrels"],
@@ -42,9 +55,11 @@ def post_deliver_barrels(barrels_delivered: list[Barrel], order_id: int):
         green_ml = 0
         dark_ml = 0
 
+        # red_potion = connection.execute("SELECT ")
+
         for barrel_delivered in barrels_delivered:
             gold_paid += barrel_delivered.price * barrel_delivered.quantity
-            if barrel_delivered.potion_type == [1,0,0,0]:
+            if barrel_delivered.potion_type == [1,0,0,0]: # do not hardcode anymore
                 red_ml += barrel_delivered.ml_per_barrel * barrel_delivered.quantity
             elif barrel_delivered.potion_type == [0,1,0,0]:
                 green_ml += barrel_delivered.ml_per_barrel * barrel_delivered.quantity
@@ -114,6 +129,7 @@ def post_deliver_barrels(barrels_delivered: list[Barrel], order_id: int):
     # return "OK"
 
 # Gets called once a day
+# work on first
 @router.post("/plan")
 def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     """
@@ -128,9 +144,9 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     wholesale_purchase_list = []
 
     with db.engine.begin() as connection: 
-        amt_green_potions = connection.execute(sqlalchemy.text("SELECT num_green_potions FROM global_inventory")).scalar_one()
-        amt_red_potions = connection.execute(sqlalchemy.text("SELECT num_red_potions FROM global_inventory")).scalar_one()
-        amt_blue_potions = connection.execute(sqlalchemy.text("SELECT num_blue_potions FROM global_inventory")).scalar_one()
+        amt_green_potions = connection.execute(sqlalchemy.text("SELECT quantity FROM potion_inventory where potion_id=2")).scalar_one()
+        amt_red_potions = connection.execute(sqlalchemy.text("SELECT quantity FROM potion_inventory WHERE potion_id=1")).scalar_one()
+        amt_blue_potions = connection.execute(sqlalchemy.text("SELECT quantity FROM potion_inventory WHERE potion_id=3")).scalar_one()
         amt_gold = connection.execute(sqlalchemy.text("SELECT gold FROM global_inventory")).scalar_one()
 
     for barrel in wholesale_catalog:

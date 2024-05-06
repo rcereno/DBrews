@@ -50,7 +50,7 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory], order_id: int
     with db.engine.begin() as connection:
         for potion in potions_delivered:
             for i in range(0,3):
-                amt_of_ml_used[i] += potion.portion_type[i]*potion.quantity
+                amt_of_ml_used[i] += potion.potion_type[i]*potion.quantity
                 potion_quantity_amt += potion.quantity
                 connection.execute(sqlalchemy.text(
                     "UPDATE potion_inventory SET quantity = quantity + :quantity_made WHERE potion_type = :type"),

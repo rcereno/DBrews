@@ -88,8 +88,14 @@ def post_visits(visit_id: int, customers: list[Customer]):
 # CREATE A CART
 def create_cart(new_cart: Customer):
     """ """
+    with db.engine.begin() as connection: 
+        cart_id = connection.execute(sqlalchemy.text("INSERT INTO carts(customer_name) VALUES (:customer_name) RETURNING id"),
+                           [{
+                                "customer_name": new_cart.customer_name
+                           }]).scalar_one()
+
     print(f"new cart: {new_cart}")
-    return {"cart_id": 1}
+    return {"cart_id": cart_id}
 
 
 class CartItem(BaseModel):
@@ -99,6 +105,14 @@ class CartItem(BaseModel):
 @router.post("/{cart_id}/items/{item_sku}")
 def set_item_quantity(cart_id: int, item_sku: str, cart_item: CartItem):
     """ """
+    with db.engine.begin() as connection:
+        potion_id = connection.execute(sqlalchemy.text("SELECT potion_id FROM potion_inventory WHERE sku = :sku"),
+                                       [{"sku": item_sku}]).scalar_one()
+
+        connection.execute(sqlalchemy.text("INSERT INTO cart_purchases (cart_id, potion_id, quantity) VALUES (:cart_id, :potion_id, :quantity)"),
+                           [{
+                               "cart_id": cart_id, "potion_id": potion_id, "quantity": cart_item.quantity 
+                           }])
     print(f"add items to cart: {cart_id} {item_sku}")
     return "OK"
 
@@ -117,23 +131,32 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
     amt_dark_potions = 0
 
     with db.engine.begin() as connection:
-        # amt_green_potions = connection.execute(sqlalchemy.text("SELECT num_green_potions FROM global_inventory")).scalar_one()
-        amt_red_potions = connection.execute(sqlalchemy.text("SELECT quantity FROM potion_inventory WHERE potion_id = 1"))
-        amt_green_potions = amt_green_potions + 1
 
-        # amt_red_potions = connection.execute(sqlalchemy.text("SELECT num_red_potions FROM global_inventory")).scalar_one()
-        amt_red_potions = connection.execute(sqlalchemy.text("SELECT quantity FROM potion_inventory WHERE potion_id = 3"))
-        amt_red_potions = amt_red_potions + 1
+        total_amt_gold = 0
+        total_potions = 0
+        cart_potions = connection.execute(sqlalchemy.text("SELECT potion_id, quantity FROM cart_purchases WHERE cart_id= :cart_id"),
+                                          {{
+                                              "cart_id": cart_id
+                                          }})
+        
+        
+        # # amt_green_potions = connection.execute(sqlalchemy.text("SELECT num_green_potions FROM global_inventory")).scalar_one()
+        # amt_red_potions = connection.execute(sqlalchemy.text("SELECT quantity FROM potion_inventory WHERE potion_id = 1"))
+        # amt_red_potions = amt_green_potions + 1
 
-        # amt_blue_potions = connection.execute(sqlalchemy.text("SELECT num_blue_potions FROM global_inventory")).scalar_one()
-        amt_blue_potions = connection.execute(sqlalchemy.text("SELECT num_blue_potions FROM global_inventory"))
-        amt_blue_potions = amt_blue_potions + 1
+        # # amt_red_potions = connection.execute(sqlalchemy.text("SELECT num_red_potions FROM global_inventory")).scalar_one()
+        # amt_green_potions = connection.execute(sqlalchemy.text("SELECT quantity FROM potion_inventory WHERE potion_id = 2"))
+        # amt_green_potions = amt_red_potions + 1
 
-        amt_dark_potions = connection.execute(sqlalchemy.text("SELECT num_dark_potions FROM global_inventory")).scalar_one()
-        amt_dark_potions = amt_dark_potions + 1
+        # # amt_blue_potions = connection.execute(sqlalchemy.text("SELECT num_blue_potions FROM global_inventory")).scalar_one()
+        # amt_blue_potions = connection.execute(sqlalchemy.text("SELECT quantity FROM potion_inventory WHERE potion_id = 3"))
+        # amt_blue_potions = amt_blue_potions + 1
 
-        amt_gold = connection.execute(sqlalchemy.text("SELECT gold FROM global_inventory")).scalar_one()
-        amt_gold = amt_gold + 50
-        result = connection.execute(sqlalchemy.text(f"UPDATE global_inventory SET gold = {amt_gold}, num_green_potions={amt_green_potions}, num_red_potions={amt_red_potions}, num_blue_potions={amt_blue_potions}"))
+        # amt_dark_potions = connection.execute(sqlalchemy.text("SELECT quantity FROM potion_inventory WHERE potion_id = 4")).scalar_one()
+        # amt_dark_potions = amt_dark_potions + 1
+
+        # amt_gold = connection.execute(sqlalchemy.text("SELECT gold FROM global_inventory")).scalar_one()
+        # amt_gold = amt_gold + 50
+        # result = connection.execute(sqlalchemy.text(f"UPDATE global_inventory SET gold = {amt_gold}, num_green_potions={amt_green_potions}, num_red_potions={amt_red_potions}, num_blue_potions={amt_blue_potions}"))
 
     return {"total_potions_bought": amt_green_potions + amt_blue_potions + amt_red_potions, "total_gold_paid": amt_gold}

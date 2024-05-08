@@ -49,16 +49,17 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory], order_id: int
     # mlUsed.append 
     with db.engine.begin() as connection:
         for potion in potions_delivered:
-            for i in range(0,3):
+            for i in range(0,4):
                 amt_of_ml_used[i] += potion.potion_type[i]*potion.quantity
-                potion_quantity_amt += potion.quantity
-                connection.execute(sqlalchemy.text(
-                    "UPDATE potion_inventory SET quantity = quantity + :quantity_made WHERE potion_type = :type"),
-                    [{
-                        "quantity_made": potion.quantity,
-                        "type": potion.potion_type
-                    }]
-                    )
+
+            potion_quantity_amt += potion.quantity
+            connection.execute(sqlalchemy.text(
+                "UPDATE potion_inventory SET quantity = quantity + :quantity_made WHERE potion_type = :type"),
+                [{
+                    "quantity_made": potion.quantity,
+                    "type": potion.potion_type
+                }]
+                )
         # is this hard code for colored potions?
         connection.execute(sqlalchemy.text(
             "UPDATE global_inventory SET num_red_ml = num_red_ml - :redUsed"),

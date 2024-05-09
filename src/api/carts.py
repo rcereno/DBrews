@@ -180,4 +180,4 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
         # amt_gold = amt_gold + 50
         # result = connection.execute(sqlalchemy.text(f"UPDATE global_inventory SET gold = {amt_gold}, num_green_potions={amt_green_potions}, num_red_potions={amt_red_potions}, num_blue_potions={amt_blue_potions}"))
 
-    return {"total_potions_bought": amt_green_potions + amt_blue_potions + amt_red_potions, "total_gold_paid": amt_gold}
+    # return {"total_potions_bought": amt_green_potions + amt_blue_potions + amt_red_potions, "total_gold_paid": amt_gold}

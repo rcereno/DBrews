@@ -155,54 +155,54 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
         amt_blue_potions = connection.execute(sqlalchemy.text("SELECT quantity FROM potion_inventory WHERE potion_id=3")).scalar_one()
         amt_gold = connection.execute(sqlalchemy.text("SELECT gold FROM global_inventory")).scalar_one()
 
-    for barrel in wholesale_catalog:
-        if barrel.sku == "SMALL_GREEN_BARREL":
-            if ((amt_green_potions < 10) and (barrel.price <= amt_gold)):
-                amt_gold -= barrel.price
-                wholesale_purchase_list.append({"sku": barrel.sku,"quantity": 1,})
-                connection.execute(sqlalchemy.text(
-                "UPDATE global_inventory SET gold = amt_gold + :gold"),
-                [{
-                    "gold": amt_gold
-                }]
-                )
-                # return [
-                    # {
-                    #     "sku": barrel.sku,
-                    #     "quantity": 1,
-                    # }
-                # ]
-        if barrel.sku == "SMALL_RED_BARREL":
-            if ((amt_red_potions < 10) and (barrel.price <= amt_gold)):
-                amt_gold -= barrel.price
-                wholesale_purchase_list.append({"sku": barrel.sku,"quantity": 1,})
-                connection.execute(sqlalchemy.text(
-                "UPDATE global_inventory SET gold = amt_gold + :gold"),
-                [{
-                    "gold": amt_gold
-                }]
-                )
-                # return [
-                #     {
-                #         "sku": barrel.sku,
-                #         "quantity": 1,
-                #     }
-                # ]
-        if barrel.sku == "SMALL_BLUE_BARREL":
-            if ((amt_blue_potions < 10) and (barrel.price <= amt_gold)):
-                amt_gold -= barrel.price
-                wholesale_purchase_list.append({"sku": barrel.sku,"quantity": 1,})
-                connection.execute(sqlalchemy.text(
-                "UPDATE global_inventory SET gold = amt_gold + :gold"),
-                [{
-                    "gold": amt_gold
-                }]
-                )
-                # return [
-                #     {
-                #         "sku": barrel.sku,
-                #         "quantity": 1,
-                #     }
-                # ]
+        for barrel in wholesale_catalog:
+            if barrel.sku == "SMALL_GREEN_BARREL":
+                if ((amt_green_potions < 10) and (barrel.price <= amt_gold)):
+                    amt_gold -= barrel.price
+                    wholesale_purchase_list.append({"sku": barrel.sku,"quantity": 1,})
+                    connection.execute(sqlalchemy.text(
+                    "UPDATE global_inventory SET gold = gold + :amt_gold"),
+                    [{
+                        "amt_gold": amt_gold
+                    }]
+                    )
+                    # return [
+                        # {
+                        #     "sku": barrel.sku,
+                        #     "quantity": 1,
+                        # }
+                    # ]
+            if barrel.sku == "SMALL_RED_BARREL":
+                if ((amt_red_potions < 10) and (barrel.price <= amt_gold)):
+                    amt_gold -= barrel.price
+                    wholesale_purchase_list.append({"sku": barrel.sku,"quantity": 1,})
+                    connection.execute(sqlalchemy.text(
+                    "UPDATE global_inventory SET gold = gold + :amt_gold"),
+                    [{
+                        "amt_gold": amt_gold
+                    }]
+                    )
+                    # return [
+                    #     {
+                    #         "sku": barrel.sku,
+                    #         "quantity": 1,
+                    #     }
+                    # ]
+            if barrel.sku == "SMALL_BLUE_BARREL":
+                if ((amt_blue_potions < 10) and (barrel.price <= amt_gold)):
+                    amt_gold -= barrel.price
+                    wholesale_purchase_list.append({"sku": barrel.sku,"quantity": 1,})
+                    connection.execute(sqlalchemy.text(
+                    "UPDATE global_inventory SET gold = gold + :amt_gold"),
+                    [{
+                        "amt_gold": amt_gold
+                    }]
+                    )
+                    # return [
+                    #     {
+                    #         "sku": barrel.sku,
+                    #         "quantity": 1,
+                    #     }
+                    # ]
     return wholesale_purchase_list
 

@@ -21,6 +21,7 @@ def get_catalog():
         for row in results:
             if row.quantity > 0: 
                 catalog.append({"sku": row.sku, "name": row.sku, "quantity": row.quantity, "price": row.price, "potion_type": row.potion_type})
+    print(f"catalog: {catalog}")
     return catalog
 
     # catalog = []

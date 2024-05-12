@@ -27,6 +27,7 @@ def get_inventory():
 
         amt_gold = connection.execute(sqlalchemy.text("SELECT gold FROM global_inventory")).scalar_one()
 
+    print(f"number of potions: {}")
     return {"number_of_potions": amt_green_potions + amt_blue_potions + amt_red_potions, "ml_in_barrels": amt_green_ml + amt_red_ml + amt_blue_ml, "gold": amt_gold}
 
 # Gets called once a day
@@ -37,6 +38,19 @@ def get_capacity_plan():
     capacity unit costs 1000 gold.
     THIS IS WHERE YOU CHANGE THE CAPACITY 
     """
+
+    with db.engine.begin() as connection:
+        amt_green_ml = connection.execute(sqlalchemy.text("SELECT num_green_ml FROM global_inventory")).scalar_one()
+        amt_red_ml = connection.execute(sqlalchemy.text("SELECT num_red_ml FROM global_inventory")).scalar_one()
+        amt_blue_ml = connection.execute(sqlalchemy.text("SELECT num_blue_ml FROM global_inventory")).scalar_one()
+
+        amt_green_potions = connection.execute(sqlalchemy.text("SELECT quantity FROM potion_inventory WHERE potion_id=2")).scalar_one()
+        amt_red_potions = connection.execute(sqlalchemy.text("SELECT quantity FROM potion_inventory WHERE Potion_id=1")).scalar_one()
+        amt_blue_potions = connection.execute(sqlalchemy.text("SELECT quantity FROM potion_inventory WHERE potion_id=3")).scalar_one()
+
+        amt_gold = connection.execute(sqlalchemy.text("SELECT gold FROM global_inventory")).scalar_one()
+
+        
 
     return {
         "potion_capacity": 0,

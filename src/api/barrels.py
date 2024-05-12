@@ -54,6 +54,7 @@ def post_deliver_barrels(barrels_delivered: list[Barrel], order_id: int):
         blue_ml = 0
         green_ml = 0
         dark_ml = 0
+        purple_ml = 0
 
         for barrel_delivered in barrels_delivered:
             gold_paid += barrel_delivered.price * barrel_delivered.quantity
@@ -65,18 +66,21 @@ def post_deliver_barrels(barrels_delivered: list[Barrel], order_id: int):
                 blue_ml += barrel_delivered.ml_per_barrel * barrel_delivered.quantity
             elif barrel_delivered.potion_type == [0,0,0,1]:
                 dark_ml += barrel_delivered.ml_per_barrel * barrel_delivered.quantity
+            elif barrel_delivered.potion_type == [50, 0, 50, 0]:
+                purple_ml += barrel_delivered.ml_per_barrel * barrel_delivered.quantity
             else:
                 raise Exception("Invalid potion type")
             
         connection.execute(
             sqlalchemy.text(
-                "UPDATE global_inventory SET num_red_ml = :red_ml, num_green_ml = :green_ml, num_blue_ml = :blue_ml, num_dark_ml = :dark_ml, gold = gold + :gold_paid"
+                "UPDATE global_inventory SET num_red_ml = :red_ml, num_green_ml = :green_ml, num_blue_ml = :blue_ml, num_dark_ml = :dark_ml, num_purple_ml = :purple_ml, gold = gold + :gold_paid"
                 ),
             [
                 {"red_ml": red_ml, 
                  "green_ml": green_ml, 
                  "blue_ml": blue_ml, 
                  "dark_ml": dark_ml, 
+                 "purple_ml": purple_ml,
                  "gold_paid": gold_paid 
                 }
             ]
@@ -153,6 +157,8 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
         amt_green_potions = connection.execute(sqlalchemy.text("SELECT quantity FROM potion_inventory where potion_id=2")).scalar_one()
         amt_red_potions = connection.execute(sqlalchemy.text("SELECT quantity FROM potion_inventory WHERE potion_id=1")).scalar_one()
         amt_blue_potions = connection.execute(sqlalchemy.text("SELECT quantity FROM potion_inventory WHERE potion_id=3")).scalar_one()
+        amt_dark_potions = connection.execute(sqlalchemy.text("SELECT quantity FROM potion_inventory WHERE potion_id=4")).scalar_one()
+        amt_purple_potions = connection.execute(sqlalchemy.text("SELECT quantity FROM potion_inventory WHERE potion_id=7")).scalar_one()
         amt_gold = connection.execute(sqlalchemy.text("SELECT gold FROM global_inventory")).scalar_one()
 
         for barrel in wholesale_catalog:
@@ -161,7 +167,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
                     amt_gold -= barrel.price
                     wholesale_purchase_list.append({"sku": barrel.sku,"quantity": 1,})
                     connection.execute(sqlalchemy.text(
-                    "UPDATE global_inventory SET gold = gold + :amt_gold"),
+                    "UPDATE global_inventory SET gold = :amt_gold"),
                     [{
                         "amt_gold": amt_gold
                     }]
@@ -177,7 +183,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
                     amt_gold -= barrel.price
                     wholesale_purchase_list.append({"sku": barrel.sku,"quantity": 1,})
                     connection.execute(sqlalchemy.text(
-                    "UPDATE global_inventory SET gold = gold + :amt_gold"),
+                    "UPDATE global_inventory SET gold = :amt_gold"),
                     [{
                         "amt_gold": amt_gold
                     }]
@@ -193,7 +199,39 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
                     amt_gold -= barrel.price
                     wholesale_purchase_list.append({"sku": barrel.sku,"quantity": 1,})
                     connection.execute(sqlalchemy.text(
-                    "UPDATE global_inventory SET gold = gold + :amt_gold"),
+                    "UPDATE global_inventory SET gold = :amt_gold"),
+                    [{
+                        "amt_gold": amt_gold
+                    }]
+                    )
+                    # return [
+                    #     {
+                    #         "sku": barrel.sku,
+                    #         "quantity": 1,
+                    #     }
+                    # ]
+            if barrel.sku == "SMALL_DARK_BARREL":
+                if ((amt_dark_potions < 10) and (barrel.price <= amt_gold)):
+                    amt_gold -= barrel.price
+                    wholesale_purchase_list.append({"sku": barrel.sku,"quantity": 1,})
+                    connection.execute(sqlalchemy.text(
+                    "UPDATE global_inventory SET gold = :amt_gold"),
+                    [{
+                        "amt_gold": amt_gold
+                    }]
+                    )
+                    # return [
+                    #     {
+                    #         "sku": barrel.sku,
+                    #         "quantity": 1,
+                    #     }
+                    # ]
+            if barrel.sku == "SMALL_PURPLE_BARREL":
+                if ((amt_purple_potions < 10) and (barrel.price <= amt_gold)):
+                    amt_gold -= barrel.price
+                    wholesale_purchase_list.append({"sku": barrel.sku,"quantity": 1,})
+                    connection.execute(sqlalchemy.text(
+                    "UPDATE global_inventory SET gold = :amt_gold"),
                     [{
                         "amt_gold": amt_gold
                     }]

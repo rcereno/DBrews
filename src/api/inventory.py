@@ -27,7 +27,7 @@ def get_inventory():
 
         amt_gold = connection.execute(sqlalchemy.text("SELECT gold FROM global_inventory")).scalar_one()
 
-    print(f"number of potions: {}")
+    print(f"number of potions: {amt_green_potions + amt_blue_potions + amt_red_potions}")
     return {"number_of_potions": amt_green_potions + amt_blue_potions + amt_red_potions, "ml_in_barrels": amt_green_ml + amt_red_ml + amt_blue_ml, "gold": amt_gold}
 
 # Gets called once a day

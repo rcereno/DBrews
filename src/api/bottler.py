@@ -85,12 +85,12 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory], order_id: int
                 "darkUsed": amt_of_ml_used[3]
               }]
         )
-        connection.execute(sqlalchemy.text(
-            "UPDATE global_inventory SET num_purple_ml = num_purple_ml - :purpleUsed"),
-             [{
-                "purpleUsed": amt_of_ml_used[4]
-              }]
-        )
+        # connection.execute(sqlalchemy.text(
+        #     "UPDATE global_inventory SET num_purple_ml = num_purple_ml - :purpleUsed"),
+        #      [{
+        #         "purpleUsed": amt_of_ml_used[4]
+        #       }]
+        # )
 
 #     with db.engine.begin() as connection: 
 #         for potion in potions_delivered:
@@ -201,13 +201,13 @@ def get_bottle_plan():
                 "quantity": amt_dark_ml // 100
             })
 
-        amt_purple_ml = connection.execute(sqlalchemy.text("SELECT num_purple_ml FROM global_inventory")).scalar()
-        if(amt_purple_ml >= 100):
-            bottler_plan.append(
-            {
-                "potion_type": [50, 0, 50, 0],
-                "quantity": amt_purple_ml // 100
-            })
+        # amt_purple_ml = connection.execute(sqlalchemy.text("SELECT num_purple_ml FROM global_inventory")).scalar()
+        # if(amt_purple_ml >= 100):
+        #     bottler_plan.append(
+        #     {
+        #         "potion_type": [50, 0, 50, 0],
+        #         "quantity": amt_purple_ml // 100
+        #     })
 
     return bottler_plan
 

@@ -1,9 +1,9 @@
-# from fastapi import APIRouter, Depends
-# from pydantic import BaseModel
-# from src.api import auth
-# import sqlalchemy
-# from src import database as db
-# from sqlalchemy.exc import IntegrityError
+from fastapi import APIRouter, Depends
+from pydantic import BaseModel
+from src.api import auth
+import sqlalchemy
+from src import database as db
+from sqlalchemy.exc import IntegrityError
 
 # ''' simple logic that doesn't look at potions
 
@@ -18,24 +18,24 @@
 # do local testing of plan and deliver
 # '''
 
-# router = APIRouter(
-#     prefix="/barrels",
-#     tags=["barrels"],
-#     dependencies=[Depends(auth.get_api_key)],
-# )
+router = APIRouter(
+    prefix="/barrels",
+    tags=["barrels"],
+    dependencies=[Depends(auth.get_api_key)],
+)
 
-# class Barrel(BaseModel):
-#     sku: str
+class Barrel(BaseModel):
+    sku: str
 
-#     ml_per_barrel: int
-#     potion_type: list[int]
-#     price: int
+    ml_per_barrel: int
+    potion_type: list[int]
+    price: int
 
-#     quantity: int
+    quantity: int
 
-# @router.post("/deliver/{order_id}")
-# def post_deliver_barrels(barrels_delivered: list[Barrel], order_id: int):
-#     """ """
+@router.post("/deliver/{order_id}")
+def post_deliver_barrels(barrels_delivered: list[Barrel], order_id: int):
+    """ """
 
 #     print(barrels_delivered)
 
@@ -136,22 +136,22 @@
 
 #     # print(f"barrels delievered: {barrels_delivered} order_id: {order_id}")
 
-#     # return "OK"
+    return "OK"
 
-# # Gets called once a day
-# # work on first
-# @router.post("/plan")
-# def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
-#     """
+# Gets called once a day
+# work on first
+@router.post("/plan")
+def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
+    """
 #     - select how many green potions 
 #     - select gold 
 #     - check how much gold green barrel costs // check how much gold abt to spend
 #     - check all conditions to see if u want to buy green barrel (if num_green_potions < 10 and have enough gold)"""
-# # if barrel is less than gold 
+# if barrel is less than gold 
 
-#     print(wholesale_catalog)
+    print(wholesale_catalog)
 
-#     wholesale_purchase_list = []
+    wholesale_purchase_list = []
 
 #     with db.engine.begin() as connection: 
 #         amt_green_potions = connection.execute(sqlalchemy.text("SELECT quantity FROM potion_inventory where potion_id=2")).scalar_one()
@@ -242,5 +242,5 @@
 #             #         #         "quantity": 1,
 #             #         #     }
 #             #         # ]
-#     return wholesale_purchase_list
+    return wholesale_purchase_list
 
